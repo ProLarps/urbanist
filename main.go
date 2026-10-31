@@ -2,19 +2,26 @@ package main
 
 import (
 	"log"
-	"net/http"
+	"os"
 
 	"github.com/prolarps/urbanist/ws"
 )
 
 func main() {
-	hub := ws.NewHub(ws.StubResolver{})
+	cfg := ws.DefaultConfig()
 
-	http.Handle("/", http.FileServer(http.Dir("static")))
-	http.HandleFunc("/ws", hub.ServeWS)
+	addr := envOr("ADDR", ":8080")
+	dbPath := envOr("DB_PATH", "urbanist.db")
 
-	log.Println("listening on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Printf("starting urbanist on %s (db=%s)", addr, dbPath)
+	if err := ws.NewServer(cfg).Run(addr, dbPath); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func envOr(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }

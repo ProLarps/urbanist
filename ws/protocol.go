@@ -1,121 +1,123 @@
 package ws
 
-import "encoding/json"
-
-// Message types sent by the client.
+// Message type constants, docs/API.md §5 (client -> server).
 const (
-	TypeChatSend  = "chat_send"
-	TypeChunkReq  = "chunk_req"
-	TypeVoteStart = "vote_start"
-	TypeVoteCast  = "vote_cast"
-	TypeNpcTalk   = "npc_talk"
-	TypeSetName   = "set_name"
+	MsgAuth        = "auth"
+	MsgMove        = "move"
+	MsgNeedChunks  = "needChunks"
+	MsgChunkPick   = "chunkPick"
+	MsgAct         = "act"
+	MsgChat        = "chat"
+	MsgChatEnd     = "chatEnd"
+	MsgChatHistory = "chatHistory"
+	MsgSubscribe   = "subscribe"
+	MsgPing        = "ping"
 )
 
-// Message types sent by the server.
+// Server -> client, docs/API.md §6.
 const (
-	TypeJoined     = "joined"
-	TypeLeft       = "left"
-	TypeChatMsg    = "chat_msg"
-	TypeChatHist   = "chat_history"
-	TypeMemberUpd  = "member_update"
-	TypeChunk      = "chunk"
-	TypeChunkUpd   = "chunk_update"
-	TypeVoteOpen   = "vote_open"
-	TypeVoteTally  = "vote_tally"
-	TypeVoteResult = "vote_result"
-	TypeNpcReply   = "npc_reply"
-	TypeError      = "error"
+	MsgAuthOk      = "authOk"
+	MsgAuthFail    = "authFail"
+	MsgGrant       = "grant"
+	MsgAssigned    = "assigned"
+	MsgChunks      = "chunks"
+	MsgChunkDelta  = "chunkDelta"
+	MsgChunkRevoke = "chunkRevoke"
+	MsgPlayers     = "players"
+	MsgPlayerUpd   = "playerUpdate"
+	MsgPlayerLeave = "playerLeave"
+	MsgNpcUpd      = "npcUpdate"
+	MsgAgentSay    = "agentSay"
+	MsgAgentEnd    = "agentEnd"
+	MsgChatHist    = "chatHistory"
+	MsgStats       = "stats"
+	MsgToast       = "toast"
+	MsgGameOver    = "gameOver"
+	MsgJournal     = "journal"
+	MsgPong        = "pong"
 )
 
-// Envelope is every message in both directions: {"type": "...", ...payload}.
-type Envelope struct {
-	Type string          `json:"type"`
-	Data json.RawMessage `json:"data,omitempty"`
+// Renovation scenarios (docs/API.md §8).
+const (
+	ScenarioRepair     = "repair"
+	ScenarioRebuild    = "rebuild"
+	ScenarioRevitalize = "revitalize"
+	ScenarioDemolish   = "demolish"
+)
+
+// scenario describes one renovation variant of a building.
+type scenario struct {
+	CostMult   float64 // cost multiplier
+	ProfitRate float64 // one-time profit as fraction of cost
+	Ticks      int     // construction duration at 10 Hz
+	WillShift  float64 // base citizens' will shift for the chunk's opinion
 }
 
-// ChatMsg is payload for chat_send (client) and chat_msg (server).
-type ChatMsg struct {
-	AuthorID string `json:"authorId,omitempty"` // omitted in client->server
-	Name     string `json:"name,omitempty"`     // set by server
-	Text     string `json:"text"`
+var scenarios = map[string]scenario{
+	ScenarioRepair:     {CostMult: 0.4, ProfitRate: 0.40, Ticks: 40, WillShift: 0.05},
+	ScenarioRebuild:    {CostMult: 1.0, ProfitRate: 0.90, Ticks: 90, WillShift: -0.05},
+	ScenarioRevitalize: {CostMult: 1.5, ProfitRate: 1.30, Ticks: 120, WillShift: 0.10},
+	ScenarioDemolish:   {CostMult: 2.0, ProfitRate: 1.70, Ticks: 150, WillShift: -0.10},
 }
 
-// ChatHistory is payload for chat_history.
-type ChatHistory struct {
-	Messages []ChatMsg `json:"messages"`
+// ClientMsg is the flat {"t": ...} frame. Optional fields are pointers so
+// one struct can decode every message type without double-guessing.
+type ClientMsg struct {
+	T string `json:"t"`
+
+	Token  *string `json:"token,omitempty"`
+	Name   *string `json:"name,omitempty"`
+	Avatar *int    `json:"avatar,omitempty"`
+
+	X    *float64 `json:"x,omitempty"`
+	Z    *float64 `json:"z,omitempty"`
+	Dir  *int     `json:"dir,omitempty"`
+	Anim *string  `json:"anim,omitempty"`
+
+	CX *int `json:"cx,omitempty"`
+	CZ *int `json:"cz,omitempty"`
+
+	LotID    *int    `json:"lotId,omitempty"`
+	Action   *string `json:"action,omitempty"`
+	Scenario *string `json:"scenario,omitempty"`
+
+	AgentID *string `json:"agentId,omitempty"`
+	Text    *string `json:"text,omitempty"`
+
+	// NOTE: ping's payload field is also named "t" per spec and numeric, so
+	// ping frames are decoded via a map, not this struct.
+	PingT *float64 `json:"pingT,omitempty"`
+
+	Channels []string `json:"channels,omitempty"`
 }
 
-// Joined / Left notification.
-type MemberInfo struct {
-	ClientID string `json:"clientId"`
-	Name     string `json:"name,omitempty"`
+// Stats is the HUD payload (docs/API.md §6).
+type Stats struct {
+	Money   float64      `json:"money"`
+	Rating  float64      `json:"rating"`
+	Cycle   int          `json:"cycle"`
+	Pending []PendingRow `json:"pending"`
+	Skipped int          `json:"skipped"`
 }
 
-// ChunkReq: client asks for chunk at (X, Y).
-type ChunkReq struct {
-	X, Y int
+type PendingRow struct {
+	CX         int    `json:"cx"`
+	CZ         int    `json:"cz"`
+	CyclesHeld int    `json:"cyclesHeld"`
+	Deadline   int64  `json:"deadline,omitempty"` // unix, only for the assigned one
+	Status     string `json:"status"`
 }
 
-// Tile is a single terrain cell. Kind maps to the front-end tile atlas.
-type Tile struct {
-	Kind int `json:"kind"`
-}
+// Toast kinds.
+const (
+	ToastInfo  = "info"
+	ToastWarn  = "warn"
+	ToastError = "error"
+	ToastOk    = "ok"
+)
 
-// ChunkData: one chunk of tiles, deterministic from the district seed.
-type ChunkData struct {
-	X     int    `json:"x"`
-	Y     int    `json:"y"`
-	Tiles []Tile `json:"tiles"`
-}
-
-// ChunkUpdate: broadcast after a decision modifies the district.
-type ChunkUpdate struct {
-	ChunkData
-	Reason string `json:"reason"`
-}
-
-// VoteStart: client asks to open a decision round (empty proposals -> defaults).
-type VoteStart struct {
-	TimeoutSec int `json:"timeoutSec,omitempty"`
-}
-
-// VoteOpen: start the information+decision phase.
-type VoteOpen struct {
-	Proposals []Proposal `json:"proposals"`
-	Deadline  int64      `json:"deadline"` // unix seconds
-}
-
-// VoteCast: client votes for a proposal (re-cast changes the vote).
-type VoteCast struct {
-	ProposalID string `json:"proposalId"`
-}
-
-// VoteTally: poll snapshot broadcast after each vote change.
-type VoteTally struct {
-	Votes map[string]int `json:"votes"`
-	Total int            `json:"total"`
-}
-
-// VoteResult: winner at deadline.
-type VoteResult struct {
-	Winner string         `json:"winner"`
-	Tally  map[string]int `json:"tally"`
-	Reason string         `json:",omitempty"`
-}
-
-// NpcTalk / NpcReply.
-type NpcTalk struct {
-	NpcID string `json:"npcId"`
-	Text  string `json:"text"`
-}
-
-type NpcReply struct {
-	NpcID string `json:"npcId"`
-	Text  string `json:"text"`
-}
-
-// ErrorMsg is sent when a client message cannot be processed.
-type ErrorMsg struct {
-	Message string `json:"message"`
-}
+// GameOver reasons.
+const (
+	LoseBankrupt = "bankrupt"
+	LoseRating   = "low_rating"
+)
