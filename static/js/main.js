@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-import { createWorld } from './world/createWorld.js';
-import './style.css';
+import { createWorld } from './createWorld.js';
+import '../css/style.css';
+
+
 
 // Создаём сцену
 const scene = new THREE.Scene();

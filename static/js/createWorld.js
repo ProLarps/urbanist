@@ -1,7 +1,11 @@
 import * as THREE from 'three';
+import { createBuilding } from './buildings.js';
 
 export function createWorld(scene) {
-
+    createBuilding(scene, -12, -12);
+    createBuilding(scene, 12, -12);
+    createBuilding(scene, -12, 12);
+    createBuilding(scene, 12, 12);
     // Освещение
     const ambientLight = new THREE.HemisphereLight(
         0xffffff,
@@ -22,7 +26,7 @@ export function createWorld(scene) {
 
     // Земля
     const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(50, 50),
+        new THREE.PlaneGeometry(1000, 1000),
         new THREE.MeshStandardMaterial({
             color: 0x75a85b
         })
