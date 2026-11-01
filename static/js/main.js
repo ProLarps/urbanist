@@ -2,9 +2,46 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 import { createWorld } from './createWorld.js';
-import '../css/style.css';
+import '../css/style_main.css';
+
+export async function startGame(options) {
+
+    const gameContainer = document.getElementById('game-container');
+
+    // Очищаем контейнер
+    gameContainer.replaceChildren();
 
 
+    // Проверяем режим запуска
+    if (options.mode === 'create') {
+
+        console.log('Создание нового мира');
+
+        // Здесь будет логика создания мира
+
+    }
+
+    else if (options.mode === 'join') {
+
+        console.log('Подключение к миру:', options.worldKey);
+
+        // Здесь будет проверка ключа и подключение к миру
+
+    }
+
+    else {
+
+        throw new Error('Неизвестный режим запуска.');
+
+    }
+
+
+    // Здесь будет инициализация Three.js
+    // Например:
+    // const renderer = new THREE.WebGLRenderer();
+    // gameContainer.appendChild(renderer.domElement);
+
+}
 
 // Создаём сцену
 const scene = new THREE.Scene();

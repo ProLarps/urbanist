@@ -1,13 +1,127 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-    <link href="/css/style.css" rel="stylesheet">
-  </head>
-  <body>
-    <canvas id="root"></canvas>
-    <script type="module" src="/js/main.js"></script>
-  </body>
+    <title>Урбанист</title>
+
+    <link href="./css/style_menu.css" rel="stylesheet">
+    <link href="./css/style_main.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <main id="menu-root">
+
+        <!-- Главное меню -->
+        <section id="menu-screen" class="screen active">
+
+            <h1>Урбанист</h1>
+
+            <button id="play-button" type="button">
+                Играть
+            </button>
+
+        </section>
+
+
+        <!-- Авторизация -->
+        <section id="auth-screen" class="screen">
+
+            <h1>Авторизация</h1>
+
+            <form id="auth-form" novalidate>
+
+                <input
+                    id="login"
+                    type="text"
+                    placeholder="Логин"
+                    autocomplete="username"
+                >
+
+                <input
+                    id="password"
+                    type="password"
+                    placeholder="Пароль"
+                    autocomplete="current-password"
+                >
+
+                <p id="auth-error" class="form-error" role="alert"></p>
+
+                <button type="submit">
+                    Войти
+                </button>
+
+            </form>
+
+            <button type="button" data-back="menu-screen">
+                Назад
+            </button>
+
+        </section>
+
+
+        <!-- Основное меню -->
+        <section id="main-menu-screen" class="screen">
+
+            <h1>Основное меню</h1>
+
+            <button id="create-world" type="button">
+                Создать мир
+            </button>
+
+            <button id="join-world" type="button">
+                Войти в мир
+            </button>
+
+            <p id="main-menu-error" class="form-error" role="alert"></p>
+
+            <button type="button" data-back="auth-screen">
+                Назад
+            </button>
+
+        </section>
+
+
+        <!-- Ввод ключа мира -->
+        <section id="world-key-screen" class="screen">
+
+            <h1>Ключ мира</h1>
+
+            <form id="world-key-form" novalidate>
+
+                <input
+                    id="world-key"
+                    type="text"
+                    placeholder="Введите ключ мира"
+                    autocomplete="off"
+                >
+
+                <p id="world-key-error" class="form-error" role="alert"></p>
+
+                <button type="submit">
+                    Войти
+                </button>
+
+            </form>
+
+            <button type="button" data-back="main-menu-screen">
+                Назад
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- Контейнер для 3D-игры -->
+    <section id="game-screen" hidden>
+        <div id="game-container"></div>
+    </section>
+
+
+    <script type="module" src="./js/menu.js"></script>
+
+</body>
 </html>

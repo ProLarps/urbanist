@@ -9,3 +9,7 @@ canvas {
     left: 0;
     display: block;
 }
+
+#game-screen[hidden] {
+    display: none !important;
+}
