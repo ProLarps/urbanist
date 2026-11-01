@@ -17,7 +17,10 @@ type GameEvent struct {
 	Chunk    *ChunkDTO
 	Options  []ChunkDTO
 	State    PlayerStateDTO
-	Reason   string // gameOver reason: bankrupt / low_rating
+	Deadline *time.Time // assigned event
+	Cycle    int        // grant event
+	AgentID  string     // agentSay event
+	Reason   string     // gameOver reason: bankrupt / low_rating
 }
 
 // nowFunc is swappable in tests so round timers need no real waiting.
@@ -46,7 +49,7 @@ func (r *Room) Pick(playerID string, cx, cz int) ([]GameEvent, errcodes.Code) {
 	}
 	p.deadline = nowFunc().Add(time.Duration(secs) * time.Second)
 	d, _ := r.world.Chunk(cx, cz)
-	ev := GameEvent{Kind: "assigned", PlayerID: playerID, Chunk: &d}
+	ev := GameEvent{Kind: "assigned", PlayerID: playerID, Chunk: &d, Deadline: &p.deadline}
 	return r.events(p, ev), errcodes.OK
 }
 

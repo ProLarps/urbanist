@@ -12,6 +12,11 @@ const (
 	MsgPing     = "ping"
 	MsgRoomJoin = "roomJoin"
 	MsgRoomAct  = "roomAct"
+	MsgAssigned = "assigned"
+	MsgGrant    = "grant"
+	MsgStats    = "stats"
+	MsgGameOver = "gameOver"
+	MsgAgentSay = "agentSay"
 )
 
 // Server -> client message types (docs/API.md §6).
