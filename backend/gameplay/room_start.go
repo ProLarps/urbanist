@@ -27,8 +27,42 @@ func (r *Room) Start(online startCheck) errcodes.Code {
 	}
 	r.cfg = GetGlobalConfig() // frozen for the whole run
 	r.world = NewWorld(r.Seed, r.cfg)
+	r.owner = map[chunkPos]string{}
 	r.mode = ModeRun
+	r.seedLoop() // first grant: 1 random chunk per player (§8 step 1)
 	return errcodes.OK
+}
+
+// GrantOptions returns the districts currently offered to a member:
+// their held-but-unassigned chunks (the "grant" frame of §6).
+func (r *Room) GrantOptions(playerID string) ([]ChunkDTO, bool) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	p, ok := r.members[playerID]
+	if !ok {
+		return nil, false
+	}
+	out := []ChunkDTO{}
+	for c := range p.granted {
+		if p.assigned != nil && *p.assigned == c {
+			continue // already picked, shown via assigned instead
+		}
+		if d, ok := r.world.Chunk(c.cx, c.cz); ok {
+			out = append(out, d)
+		}
+	}
+	return out, true
+}
+
+// Get returns one member's economic state; ok=false for non-members.
+func (r *Room) Get(playerID string) (Member, float64, float64, int, bool) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	p, ok := r.members[playerID]
+	if !ok {
+		return Member{}, 0, 0, 0, false
+	}
+	return p.Member, p.Money, p.Rating, p.cycle, true
 }
 
 // Chunk exposes one district of the world with copied cells, so callers

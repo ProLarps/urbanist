@@ -8,6 +8,7 @@ import (
 
 type District struct {
 	Rennovation int
+	Will        float64 // citizens' will 0..1, base per renovation type
 	Data        []uint8 // Flat array: index = y * ChunkSize + x
 }
 
@@ -15,6 +16,7 @@ func GenerateDistrict(cfg *config.Config, rng *rand.Rand) *District {
 	res := &District{
 		Rennovation: chooseDistrictRennovation(cfg, rng),
 	}
+	res.Will = WillBase(res.Rennovation)
 	res.generateMap(cfg, rng)
 	return res
 }
@@ -96,5 +98,23 @@ func getSurroundingBuildingType(renovation int) int {
 		return config.BUILDING_SMALL_HOUSE
 	default:
 		return config.BUILDING_FLAT
+	}
+}
+
+// WillBase is the citizens' will (docs/API.md §8) of a district with the
+// given renovation type, before any player persuasion shifts it. The game
+// loop applies RatingStep * (will - 0.5) * 2 to the renovator's rating.
+func WillBase(renovation int) float64 {
+	switch renovation {
+	case config.RENNOVATE_PARK:
+		return 0.70 // green space is loved
+	case config.RENNOVATE_LAKE:
+		return 0.65
+	case config.RENNOVATE_ALLEY:
+		return 0.55
+	case config.RENNOVATE_OLD_HOUSE:
+		return 0.50
+	default: // PANEL_FLAT: demolition feel, people are wary
+		return 0.35
 	}
 }

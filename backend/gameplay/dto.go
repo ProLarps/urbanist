@@ -40,8 +40,29 @@ type ChunkDTO struct {
 	CX          int     `json:"cx"`
 	CZ          int     `json:"cz"`
 	Rennovation int     `json:"rennovation"`
+	Will        float64 `json:"will"` // citizens' will 0..1 (§8)
 	Size        int     `json:"size"`
 	Cells       []uint8 `json:"cells"`
+}
+
+// PendingRow is one held district in stats.pending (docs/API.md §6).
+type PendingRow struct {
+	CX         int   `json:"cx"`
+	CZ         int   `json:"cz"`
+	CyclesHeld int   `json:"cyclesHeld"`
+	Deadline   int64 `json:"deadline,omitempty"` // unix seconds, 0 if none
+}
+
+// PlayerStateDTO is the "stats" frame body (§6): economy + held districts.
+type PlayerStateDTO struct {
+	PlayerID string       `json:"playerId"`
+	Money    float64      `json:"money"`
+	Rating   float64      `json:"rating"`
+	Cycle    int          `json:"cycle"`
+	Score    float64      `json:"score"`
+	Alive    bool         `json:"alive"`
+	Pending  []PendingRow `json:"pending"`
+	Skipped  int          `json:"skipped"`
 }
 
 // WorldInfo mirrors docs/API.md §2.1 "world" block.

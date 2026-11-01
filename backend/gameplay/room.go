@@ -20,6 +20,21 @@ type roomPlayer struct {
 	Money  float64
 	Rating float64
 	Alive  bool
+
+	// Game loop state (§8), valid only in run mode: cycle counter, held
+	// districts, the one under the round timer and its deadline.
+	cycle    int
+	granted  map[chunkPos]bool
+	assigned *chunkPos
+	deadline time.Time
+	skipped  int
+}
+
+func newRoomPlayer(m Member, cfg config.Config) *roomPlayer {
+	return &roomPlayer{
+		Member: m, Money: cfg.StartMoney, Rating: cfg.RatingStart,
+		Alive: true, granted: map[chunkPos]bool{},
+	}
 }
 
 // Room is one independent city lobby. It is ephemeral by design: it lives
@@ -39,6 +54,7 @@ type Room struct {
 	// Set when the room enters run mode; nil in wait mode.
 	world *World
 	cfg   config.Config
+	owner map[chunkPos]string // chunk -> player holding it (§8)
 }
 
 // View snapshots the roster for HTTP/WS consumers.
