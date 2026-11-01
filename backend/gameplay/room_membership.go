@@ -28,10 +28,11 @@ func (r *Room) Join(m Member) errcodes.Code {
 		return errcodes.OK
 	}
 	r.members[m.ID] = &roomPlayer{
-		Member: m,
-		Money:  r.moneyOnJoin(),
-		Rating: r.ratingOnJoin(),
-		Alive:  true,
+		Member:  m,
+		Money:   r.moneyOnJoin(),
+		Rating:  r.ratingOnJoin(),
+		Alive:   true,
+		granted: map[chunkPos]*heldChunk{},
 	}
 	return errcodes.OK
 }

@@ -60,6 +60,33 @@ func TestUnknownFrameToasts(t *testing.T) {
 	}
 }
 
+// TestRoomActState covers roomAct{action:"state"}: without a room binding
+// the socket gets an error toast; after joining over HTTP it receives the
+// authoritative roomState frame (docs/API.md §5 roomAct).
+func TestRoomActState(t *testing.T) {
+	base, issue := bootServer(t)
+	token := issue("Гриша", auth.RolePlayer)
+
+	status, room := httpJSON(t, "POST", base+"/api/rooms", `{"name":"act","maxPlayers":2}`, token)
+	if status != 201 {
+		t.Fatalf("create room: %d %v", status, room)
+	}
+	code, _ := room["code"].(string)
+	if status, _ := httpJSON(t, "POST", base+"/api/rooms/"+code+"/start", "", token); status != 409 {
+		t.Fatalf("offline start must be rejected: %d", status)
+	}
+
+	conn := dial(t, "ws"+stripScheme(base)+"/ws"+"?token="+token)
+	defer conn.Close(websocket.StatusNormalClosure, "")
+	readJSON(t, conn) // authOk rebinds the membership automatically
+
+	sendJSON(t, conn, `{"t":"roomAct","action":"state"}`)
+	frame := readJSON(t, conn)
+	if frame["t"] != "roomState" {
+		t.Fatalf("roomAct state: %v", frame)
+	}
+}
+
 // stripScheme turns an http test URL into its host part for ws:// URLs.
 func stripScheme(url string) string {
 	const prefixLen = len("http")

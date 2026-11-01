@@ -92,3 +92,16 @@ func probe(payload []byte) (t string, body map[string]json.RawMessage, ok bool) 
 	_ = json.Unmarshal(raw, &t)
 	return t, body, true
 }
+
+// bodyAny decodes raw frame fields into plain values, so action handlers
+// can read them without caring about the JSON representation.
+func bodyAny(body map[string]json.RawMessage) map[string]any {
+	out := map[string]any{}
+	for k, raw := range body {
+		var v any
+		if err := json.Unmarshal(raw, &v); err == nil {
+			out[k] = v
+		}
+	}
+	return out
+}

@@ -13,6 +13,10 @@ import (
 	"github.com/prolarps/urbanist/backend/config"
 )
 
+// NotYetImplemented is the shared toast text for protocol frames whose
+// game-loop stage (move, chunks, act, chat) has not been built yet.
+const NotYetImplemented = "not implemented at this stage"
+
 // GlobalConfig is the mutable server-wide gameplay configuration.
 // The administrator panel edits it; new rooms copy it on start.
 var globalLock sync.RWMutex
