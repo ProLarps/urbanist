@@ -67,9 +67,15 @@ func TestPickAndRenovateFullRound(t *testing.T) {
 	if _, code := r.Renovate(p.ID, c.cx, c.cz, needs[len(needs)-1], "demolish"); code != errcodes.BadRequest {
 		t.Fatalf("expected BadRequest on bankrupt renovate, got %v", code)
 	}
-	// Finish every remaining needs-cell -> round closes with a fresh grant.
+	// Finish every remaining needs-cell -> round closes with a fresh
+	// grant. The wallet is topped up first because the §8 bankruptcy
+	// check (money < cheapest project) legitimately kills a player who
+	// spent everything on one expensive scenario mid-round.
 	p.Money = r.cfg.StartMoney
-	for _, cell := range needs[1:] {
+	for i, cell := range needs[1:] {
+		if i%3 == 2 {
+			p.Money = r.cfg.StartMoney // keep solvent while grinding cells
+		}
 		if _, code := r.Renovate(p.ID, c.cx, c.cz, cell, "repair"); code != errcodes.OK {
 			t.Fatalf("renovate rest: %v", code)
 		}
