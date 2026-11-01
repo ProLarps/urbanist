@@ -33,6 +33,9 @@ type ScoreRow struct {
 	Online   bool    `json:"online"`
 }
 
+// scoreOf is the single place where the §8 session score formula lives.
+func scoreOf(p *roomPlayer) float64 { return p.Money * p.Rating }
+
 // ChunkDTO describes one generated district: the renovation type playing
 // the chunk's theme plus the flat array of cells (index = y*size + x,
 // values are config.BUILDING_*).

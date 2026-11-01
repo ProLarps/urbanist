@@ -14,6 +14,24 @@ const (
 	ModeRun  = "run"
 )
 
+// heldChunk tracks one district a player owns but has not renovated yet:
+// how many cycles it survived unassigned (skip rule §8) and which of its
+// renovation cells are already done.
+type heldChunk struct {
+	cx, cz   int
+	age      int
+	done     map[int]bool
+	renovate map[int]string // cell index -> scenario, for profit on finish
+}
+
+func newHeld(c chunkPos) *heldChunk {
+	return &heldChunk{cx: c.cx, cz: c.cz, age: 1,
+		done: map[int]bool{}, renovate: map[int]string{}}
+}
+
+// pos converts back to the world-grid coordinate.
+func (h *heldChunk) pos() chunkPos { return chunkPos{h.cx, h.cz} }
+
 // roomPlayer is one participant with per-room economic state.
 type roomPlayer struct {
 	Member
@@ -24,16 +42,17 @@ type roomPlayer struct {
 	// Game loop state (§8), valid only in run mode: cycle counter, held
 	// districts, the one under the round timer and its deadline.
 	cycle    int
-	granted  map[chunkPos]bool
+	granted  map[chunkPos]*heldChunk
 	assigned *chunkPos
 	deadline time.Time
 	skipped  int
+	best     float64 // best session score, persisted to the profile (§11)
 }
 
 func newRoomPlayer(m Member, cfg config.Config) *roomPlayer {
 	return &roomPlayer{
 		Member: m, Money: cfg.StartMoney, Rating: cfg.RatingStart,
-		Alive: true, granted: map[chunkPos]bool{},
+		Alive: true, granted: map[chunkPos]*heldChunk{},
 	}
 }
 
@@ -55,6 +74,7 @@ type Room struct {
 	world *World
 	cfg   config.Config
 	owner map[chunkPos]string // chunk -> player holding it (§8)
+	will  map[chunkPos]float64 // citizens' will, shifted by persuasion (§8)
 }
 
 // View snapshots the roster for HTTP/WS consumers.

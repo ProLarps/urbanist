@@ -49,7 +49,7 @@ func grantable(cx, cz int) bool {
 
 // freeNeighbours lists unowned chunks adjacent to any of the player's held
 // districts (§8 step 3). The caller holds r.mu; ownership lives in Room.
-func (w *World) freeNeighbours(held map[chunkPos]bool, taken func(chunkPos) bool) []chunkPos {
+func (w *World) freeNeighbours(held map[chunkPos]*heldChunk, taken func(chunkPos) bool) []chunkPos {
 	seen := map[chunkPos]bool{}
 	var out []chunkPos
 	for p := range held {

@@ -43,7 +43,8 @@ func (r *Room) GrantOptions(playerID string) ([]ChunkDTO, bool) {
 		return nil, false
 	}
 	out := []ChunkDTO{}
-	for c := range p.granted {
+	for _, held := range p.granted {
+		c := held.pos()
 		if p.assigned != nil && *p.assigned == c {
 			continue // already picked, shown via assigned instead
 		}
@@ -52,6 +53,19 @@ func (r *Room) GrantOptions(playerID string) ([]ChunkDTO, bool) {
 		}
 	}
 	return out, true
+}
+
+// bestScores reports every member's session-best score (money x rating),
+// which routes persist into player profiles (§2.3, §11). Holds r.mu.
+func (r *Room) bestScores() map[string]float64 {
+	out := make(map[string]float64, len(r.members))
+	for id, p := range r.members {
+		if p.best < scoreOf(p) {
+			p.best = scoreOf(p)
+		}
+		out[id] = p.best
+	}
+	return out
 }
 
 // Get returns one member's economic state; ok=false for non-members.
