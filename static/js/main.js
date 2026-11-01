@@ -2,30 +2,37 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 import { createWorld } from './createWorld.js';
-import '../css/style_main.css';
+import '../css/menu.css';
 
-export async function startGame(options) {
+let gameStarted = false;
+
+// Основная функция запуска игры
+export async function startGame(options = {}) {
+
+    if (gameStarted) return;
 
     const gameContainer = document.getElementById('game-container');
 
-    // Очищаем контейнер
-    gameContainer.replaceChildren();
-
+    if (!gameContainer) {
+        throw new Error('Не найден game-container!');
+    }
 
     // Проверяем режим запуска
-    if (options.mode === 'create') {
+    if (options.mode === 'test') {
+
+        console.log('Запуск тестового режима');
+
+    }
+
+    else if (options.mode === 'create') {
 
         console.log('Создание нового мира');
-
-        // Здесь будет логика создания мира
 
     }
 
     else if (options.mode === 'join') {
 
         console.log('Подключение к миру:', options.worldKey);
-
-        // Здесь будет проверка ключа и подключение к миру
 
     }
 
@@ -35,60 +42,82 @@ export async function startGame(options) {
 
     }
 
+    // Очищаем контейнер
+    gameContainer.replaceChildren();
 
-    // Здесь будет инициализация Three.js
-    // Например:
-    // const renderer = new THREE.WebGLRenderer();
-    // gameContainer.appendChild(renderer.domElement);
+    // Создаём сцену
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb);
 
-}
+    // Создаём камеру
+    const camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+    );
 
-// Создаём сцену
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
+    camera.position.set(20, 20, 20);
 
-// Создаём камеру
-const camera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-);
-
-camera.position.set(20, 20, 20);
-
-// Создаём рендерер
-const renderer = new THREE.WebGLRenderer({
-    antialias: true
-});
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-document.body.appendChild(renderer.domElement);
-
-// Временное управление камерой для разработки
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, 0);
-controls.update();
-
-// Создаём игровой мир
-createWorld(scene);
-
-// Обработка изменения размера окна
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    // Создаём рендерер
+    const renderer = new THREE.WebGLRenderer({
+        antialias: true
+    });
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Игровой цикл
-function animate() {
-    requestAnimationFrame(animate);
+    // Добавляем canvas в контейнер игры
+    gameContainer.appendChild(renderer.domElement);
 
+    // Временное управление камерой
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    controls.target.set(0, 0, 0);
     controls.update();
-    renderer.render(scene, camera);
+
+    // Создаём игровой мир
+    createWorld(scene);
+
+    // Обработка изменения размера окна
+    function resize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+    }
+
+    window.addEventListener('resize', resize);
+
+    // Скрываем меню после успешного запуска
+    document.querySelector('#menu')?.style.setProperty('display', 'none');
+
+    gameStarted = true;
+
+    // Игровой цикл
+    function animate() {
+
+        requestAnimationFrame(animate);
+
+        controls.update();
+
+        renderer.render(scene, camera);
+
+    }
+
+    animate();
+
+    console.log('Игра успешно запущена!');
 }
 
-animate();
+
+// Получаем событие от menu.js
+window.addEventListener('urbanist:start-game', (event) => {
+
+    startGame(event.detail).catch(error => {
+        console.error('Ошибка запуска игры:', error);
+    });
+
+});

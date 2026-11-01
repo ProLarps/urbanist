@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101a1a">
+    <title>Регистрация — Урбанист</title>
+    <link rel="stylesheet" href="./css/menu.css">
+</head>
+<body>
+    <main class="app-shell">
+        <section class="panel" aria-labelledby="register-title">
+            <div class="brand-mark" aria-hidden="true">У</div>
+            <p class="eyebrow">НОВЫЙ АККАУНТ</p>
+            <h1 id="register-title">Регистрация</h1>
+            <p class="muted">Создай аккаунт, чтобы играть под своим именем.</p>
+
+            <form id="register-form" class="form-stack">
+                <label for="register-name">Имя игрока</label>
+                <input id="register-name" name="name" type="text" minlength="1" maxlength="24"
+                       autocomplete="username" placeholder="От 1 до 24 символов" required>
+
+                <label for="register-password">Пароль</label>
+                <input id="register-password" name="password" type="password" minlength="8"
+                       autocomplete="new-password" placeholder="Не менее 8 символов" required>
+
+                <label for="register-password-repeat">Повтори пароль</label>
+                <input id="register-password-repeat" name="passwordRepeat" type="password" minlength="8"
+                       autocomplete="new-password" placeholder="Повтори пароль" required>
+
+                <button class="button button-primary" type="submit" id="register-button">Зарегистрироваться</button>
+            </form>
+
+            <p class="switch-line"><a href="./index.html">Вернуться ко входу</a></p>
+            <p class="message" id="register-message" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+    <script type="module" src="./js/register.js"></script>
+</body>
+</html>

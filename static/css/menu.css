@@ -1,0 +1,211 @@
+:root {
+    color-scheme: dark;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #edf5f1;
+    background: #101a1a;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    min-width: 320px;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 18% 12%, rgba(65, 132, 98, .22), transparent 34rem),
+        radial-gradient(circle at 88% 82%, rgba(54, 105, 92, .16), transparent 30rem),
+        #101a1a;
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; opacity: .65; }
+
+.app-shell {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 32px 18px;
+}
+
+.panel {
+    width: min(100%, 460px);
+    padding: 38px;
+    border: 1px solid rgba(205, 232, 216, .14);
+    border-radius: 24px;
+    background: rgba(22, 36, 34, .94);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .34);
+}
+
+.panel-wide { width: min(100%, 720px); }
+
+.brand-mark {
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 22px;
+    border-radius: 17px;
+    color: #102018;
+    background: #a5d6ad;
+    font-size: 30px;
+    font-weight: 900;
+}
+
+.eyebrow {
+    margin: 0 0 9px;
+    color: #9bc6a4;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .16em;
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -.04em;
+}
+
+h2 { margin: 0; font-size: 19px; }
+.muted { color: #a9bbb2; line-height: 1.55; }
+
+.form-stack { display: grid; gap: 11px; margin-top: 28px; }
+.form-stack label { color: #d9e8df; font-size: 13px; font-weight: 700; }
+
+input {
+    width: 100%;
+    min-height: 50px;
+    padding: 0 15px;
+    border: 1px solid rgba(212, 235, 220, .18);
+    border-radius: 12px;
+    outline: none;
+    color: #f4faf6;
+    background: rgba(7, 17, 15, .56);
+}
+
+input:focus { border-color: #95cda0; box-shadow: 0 0 0 3px rgba(149, 205, 160, .13); }
+input::placeholder { color: #71867a; }
+
+.button {
+    min-height: 44px;
+    padding: 0 17px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font-weight: 750;
+    transition: transform .15s ease, filter .15s ease, background .15s ease;
+}
+.button:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.button-primary { color: #102018; background: #a5d6ad; }
+.button-secondary { color: #e4f0e8; border-color: rgba(212, 235, 220, .2); background: rgba(255, 255, 255, .055); }
+.button-quiet { color: #b8c9bf; border-color: rgba(212, 235, 220, .15); background: transparent; }
+.form-stack .button { margin-top: 8px; }
+
+.switch-line { margin: 22px 0 0; color: #a9bbb2; font-size: 13px; text-align: center; }
+a { color: #a5d6ad; font-weight: 700; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.panel-heading, .lobby-topline, .toolbar, .participants-heading, .lobby-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.panel-heading { align-items: flex-start; }
+.panel-heading .muted, .lobby-topline .muted { margin-bottom: 0; }
+.toolbar { justify-content: flex-start; flex-wrap: wrap; margin: 26px 0 20px; }
+
+.room-list { display: grid; gap: 10px; }
+.room-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid rgba(212, 235, 220, .13);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, .035);
+}
+.room-card h3 { margin: 0 0 5px; font-size: 16px; }
+.room-card p { margin: 0; color: #9eb2a6; font-size: 12px; }
+.room-card .button { flex: 0 0 auto; }
+
+.invite-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 26px 0;
+    padding: 18px 20px;
+    border: 1px solid rgba(165, 214, 173, .25);
+    border-radius: 16px;
+    background: rgba(119, 176, 129, .09);
+}
+.invite-label { display: block; margin-bottom: 7px; color: #a9bbb2; font-size: 12px; }
+.invite-code { color: #c2edc8; font-size: clamp(21px, 4vw, 29px); letter-spacing: .12em; }
+.role-badge, .count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: #c7efce;
+    background: rgba(119, 176, 129, .16);
+    font-size: 12px;
+    font-weight: 800;
+}
+.role-badge { padding: 8px 12px; white-space: nowrap; }
+.count-badge { min-width: 28px; height: 28px; }
+.participants-heading { justify-content: flex-start; margin-bottom: 12px; }
+.participant-list { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.participant-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 54px;
+    padding: 9px 12px 9px 15px;
+    border: 1px solid rgba(212, 235, 220, .1);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .035);
+}
+.participant-name { overflow-wrap: anywhere; font-weight: 650; }
+.participant-tag { margin-left: 9px; color: #9bc6a4; font-size: 11px; }
+.kick-button { min-height: 34px; padding: 0 11px; color: #ffc0b5; border: 1px solid rgba(255, 151, 134, .22); border-radius: 9px; background: rgba(255, 115, 91, .08); font-size: 12px; }
+.empty-state { padding: 16px; color: #9eb2a6; border: 1px dashed rgba(212, 235, 220, .17); border-radius: 12px; text-align: center; }
+
+.message { min-height: 20px; margin: 12px 0 0; color: #ffb8a9; font-size: 13px; line-height: 1.45; }
+.message.success { color: #a5d6ad; }
+.fine-print { margin: 14px 0 0; color: #71867a; font-size: 11px; }
+
+@media (max-width: 560px) {
+    .panel { padding: 25px 20px; border-radius: 19px; }
+    .panel-heading, .lobby-topline { align-items: flex-start; }
+    .room-card { align-items: flex-start; flex-direction: column; }
+    .room-card .button { width: 100%; }
+    .invite-card { align-items: flex-start; flex-direction: column; }
+    .invite-card .button { width: 100%; }
+}
+
+#dev-test-button {
+    margin-top: 15px;
+    padding: 12px 24px;
+
+    background: #555;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+#dev-test-button:hover {
+    background: #777;
+}

@@ -1,11 +1,25 @@
 import * as THREE from 'three';
 import { createBuilding } from './buildings.js';
+import { createRoadStraight, createRoadStraight90, createRoadCrossroadPath } from './environment.js';
 
+const LenChunk = 16;
 export function createWorld(scene) {
-    createBuilding(scene, -12, -12);
-    createBuilding(scene, 12, -12);
-    createBuilding(scene, -12, 12);
-    createBuilding(scene, 12, 12);
+    let x_blocks = 2;
+    for (let i = -x_blocks; i <= x_blocks; i++) {
+        for (let j = -x_blocks; j <= x_blocks; j++){
+            createRoadCrossroadPath(scene, i*LenChunk, j*LenChunk);
+            for (let t = i*LenChunk - LenChunk/2; t < i*LenChunk + LenChunk/2; t++){
+                if (t != i*LenChunk) {
+                    createRoadStraight(scene, t, j*LenChunk);
+                }
+            }
+            for (let t = j*LenChunk - LenChunk/2; t < j*LenChunk + LenChunk/2; t++){
+                if (t != i*LenChunk) {
+                    createRoadStraight90(scene, i*LenChunk, t);
+                }
+            }
+        }
+    }
     // Освещение
     const ambientLight = new THREE.HemisphereLight(
         0xffffff,
@@ -35,17 +49,4 @@ export function createWorld(scene) {
     ground.rotation.x = -Math.PI / 2;
 
     scene.add(ground);
-
-
-    // Дорога
-    const road = new THREE.Mesh(
-        new THREE.BoxGeometry(40, 0.1, 6),
-        new THREE.MeshStandardMaterial({
-            color: 0x444444
-        })
-    );
-
-    road.position.set(0, 0.05, 0);
-
-    scene.add(road);
 }

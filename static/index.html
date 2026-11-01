@@ -1,127 +1,94 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101a1a">
     <title>Урбанист</title>
-
-    <link href="./css/style_menu.css" rel="stylesheet">
-    <link href="./css/style_main.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/menu.css">
 </head>
-
 <body>
+    <div id="game-container"></div>
+    <main class="app-shell">
+        <!-- Экран входа -->
+        <section class="panel" id="login-view" aria-labelledby="login-title">
+            <div class="brand-mark" aria-hidden="true">У</div>
+            <p class="eyebrow">МУЛЬТИПЛЕЕРНЫЙ ГОРОДСКОЙ СИМУЛЯТОР</p>
+            <h1 id="login-title">Урбанист</h1>
+            <p class="muted">Введи имя, чтобы посмотреть доступные комнаты.</p>
 
-    <main id="menu-root">
-
-        <!-- Главное меню -->
-        <section id="menu-screen" class="screen active">
-
-            <h1>Урбанист</h1>
-
-            <button id="play-button" type="button">
-                Играть
-            </button>
-
-        </section>
-
-
-        <!-- Авторизация -->
-        <section id="auth-screen" class="screen">
-
-            <h1>Авторизация</h1>
-
-            <form id="auth-form" novalidate>
-
-                <input
-                    id="login"
-                    type="text"
-                    placeholder="Логин"
-                    autocomplete="username"
-                >
-
-                <input
-                    id="password"
-                    type="password"
-                    placeholder="Пароль"
-                    autocomplete="current-password"
-                >
-
-                <p id="auth-error" class="form-error" role="alert"></p>
-
-                <button type="submit">
-                    Войти
-                </button>
-
+            <form id="login-form" class="form-stack">
+                <label for="player-name">Имя игрока</label>
+                <input id="player-name" name="name" type="text" minlength="1" maxlength="24"
+                       autocomplete="nickname" placeholder="Например, Артём" required>
+                <button class="button button-primary" type="submit" id="login-button">Продолжить</button>
             </form>
 
-            <button type="button" data-back="menu-screen">
-                Назад
+            <p class="switch-line">Ещё нет аккаунта? <a href="./register.html">Зарегистрироваться</a></p>
+            <button id="dev-test-button">
+                Тестировать без авторизации
             </button>
-
+            <p class="message" id="login-message" role="status" aria-live="polite"></p>
         </section>
 
+        <!-- Список комнат -->
+        <section class="panel panel-wide" id="rooms-view" aria-labelledby="rooms-title" hidden>
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">ПОДКЛЮЧЕНИЕ</p>
+                    <h1 id="rooms-title">Комнаты</h1>
+                    <p class="muted">Выбери открытую комнату или создай свою.</p>
+                </div>
+                <button class="button button-quiet" type="button" id="logout-button">Выйти</button>
+            </div>
 
-        <!-- Основное меню -->
-        <section id="main-menu-screen" class="screen">
+            <div class="toolbar">
+                <button class="button button-primary" type="button" id="create-room-button">＋ Создать комнату</button>
+                <button class="button button-secondary" type="button" id="refresh-rooms-button">Обновить список</button>
+            </div>
 
-            <h1>Основное меню</h1>
-
-            <button id="create-world" type="button">
-                Создать мир
-            </button>
-
-            <button id="join-world" type="button">
-                Войти в мир
-            </button>
-
-            <p id="main-menu-error" class="form-error" role="alert"></p>
-
-            <button type="button" data-back="auth-screen">
-                Назад
-            </button>
-
+            <div class="room-list" id="room-list" aria-live="polite">
+                <p class="muted">Загружаем комнаты…</p>
+            </div>
+            <p class="message" id="rooms-message" role="status" aria-live="polite"></p>
         </section>
 
+        <!-- Ожидание участников -->
+        <section class="panel panel-wide" id="lobby-view" aria-labelledby="lobby-title" hidden>
+            <div class="lobby-topline">
+                <div>
+                    <p class="eyebrow">КОМНАТА СОЗДАНА</p>
+                    <h1 id="lobby-title">Ожидание участников</h1>
+                    <p class="muted" id="lobby-subtitle">Ожидаем подключения остальных игроков.</p>
+                </div>
+                <span class="role-badge" id="role-badge" hidden>Модератор</span>
+            </div>
 
-        <!-- Ввод ключа мира -->
-        <section id="world-key-screen" class="screen">
+            <div class="invite-card">
+                <div>
+                    <span class="invite-label">Уникальный код комнаты</span>
+                    <strong class="invite-code" id="invite-code">—</strong>
+                </div>
+                <button class="button button-secondary" type="button" id="copy-code-button">Копировать</button>
+            </div>
 
-            <h1>Ключ мира</h1>
+            <div class="participants-heading">
+                <h2>Участники</h2>
+                <span class="count-badge" id="participant-count">0</span>
+            </div>
+            <ul class="participant-list" id="participant-list" aria-live="polite">
+                <li class="empty-state">Пока никого нет.</li>
+            </ul>
 
-            <form id="world-key-form" novalidate>
-
-                <input
-                    id="world-key"
-                    type="text"
-                    placeholder="Введите ключ мира"
-                    autocomplete="off"
-                >
-
-                <p id="world-key-error" class="form-error" role="alert"></p>
-
-                <button type="submit">
-                    Войти
-                </button>
-
-            </form>
-
-            <button type="button" data-back="main-menu-screen">
-                Назад
-            </button>
-
+            <p class="message" id="lobby-message" role="status" aria-live="polite"></p>
+            <div class="lobby-actions">
+                <button class="button button-secondary" type="button" id="back-to-rooms-button">К списку комнат</button>
+            </div>
+            <p class="fine-print">Список участников обновляется автоматически.</p>
         </section>
-
     </main>
 
-
-    <!-- Контейнер для 3D-игры -->
-    <section id="game-screen" hidden>
-        <div id="game-container"></div>
-    </section>
-
-
+    <script type="module" src="./js/main.js"></script>
     <script type="module" src="./js/menu.js"></script>
-
 </body>
 </html>

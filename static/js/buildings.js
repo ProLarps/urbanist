@@ -1,20 +1,22 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-export function createBuilding(scene, x, z) {
+const loader = new GLTFLoader();
 
-    const geometry = new THREE.BoxGeometry(5, 8, 5);
+export async function createBuilding(scene, x, z) {
 
-    const material = new THREE.MeshStandardMaterial({
-        color: 0xd5c4a1
-    });
-
-    const building = new THREE.Mesh(
-        geometry,
-        material
+    // Загружаем модель
+    const gltf = await loader.loadAsync(
+        '/assets/models/buildings/cube.glb'
     );
 
-    building.position.set(x, 4, z);
+    // Получаем объект модели
+    const building = gltf.scene;
 
+    // Устанавливаем положение
+    building.position.set(x, 0, z);
+
+    // Добавляем модель в сцену
     scene.add(building);
 
     return building;
