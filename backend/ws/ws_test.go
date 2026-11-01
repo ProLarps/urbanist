@@ -72,7 +72,7 @@ func TestRoomActState(t *testing.T) {
 		t.Fatalf("create room: %d %v", status, room)
 	}
 	code, _ := room["code"].(string)
-	if status, _ := httpJSON(t, "GET", base+"/api/rooms/"+code+"/start", "", token); status != 409 {
+	if status, _ := httpJSON(t, "POST", base+"/api/rooms/"+code+"/start", "", token); status != 409 {
 		t.Fatalf("offline start must be rejected: %d", status)
 	}
 

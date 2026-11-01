@@ -45,6 +45,11 @@ type Room struct {
 func (r *Room) View() RoomView {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	return r.viewLocked()
+}
+
+// viewLocked builds the snapshot; callers must already hold r.mu.
+func (r *Room) viewLocked() RoomView {
 	members := make([]Member, 0, len(r.members))
 	for _, p := range r.members {
 		members = append(members, p.Member)
@@ -77,5 +82,5 @@ func (r *Room) Patch(name string, maxPlayers int) (RoomView, errcodes.Code) {
 	if maxPlayers != 0 {
 		r.MaxPlayers = clampRange(maxPlayers, 1, 64)
 	}
-	return r.View(), errcodes.OK
+	return r.viewLocked(), errcodes.OK
 }
