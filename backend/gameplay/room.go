@@ -73,8 +73,10 @@ type Room struct {
 	// Set when the room enters run mode; nil in wait mode.
 	world *World
 	cfg   config.Config
-	owner map[chunkPos]string // chunk -> player holding it (§8)
+	owner map[chunkPos]string  // chunk -> player holding it (§8)
 	will  map[chunkPos]float64 // citizens' will, shifted by persuasion (§8)
+
+	pendingEvents []GameEvent // loop outbox drained by the hub (§6)
 }
 
 // View snapshots the roster for HTTP/WS consumers.

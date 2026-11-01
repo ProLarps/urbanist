@@ -2,8 +2,6 @@ package gameplay
 
 import (
 	"math/rand/v2"
-
-	"github.com/prolarps/urbanist/backend/config"
 )
 
 // nextGrant offers up to ChunksPerGrant neighbours of held districts (§8).

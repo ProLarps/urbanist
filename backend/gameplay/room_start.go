@@ -28,6 +28,7 @@ func (r *Room) Start(online startCheck) errcodes.Code {
 	r.cfg = GetGlobalConfig() // frozen for the whole run
 	r.world = NewWorld(r.Seed, r.cfg)
 	r.owner = map[chunkPos]string{}
+	r.will = map[chunkPos]float64{}
 	r.mode = ModeRun
 	r.seedLoop() // first grant: 1 random chunk per player (§8 step 1)
 	return errcodes.OK
