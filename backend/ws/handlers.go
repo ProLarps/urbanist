@@ -1,5 +1,9 @@
 package ws
 
+import (
+	"github.com/prolarps/urbanist/backend/gameplay"
+)
+
 // handleFrame routes one client frame by its "t" (docs/API.md §5).
 // This stage implements connection bookkeeping: ping, re-auth and room
 // binding. Gameplay actions (move, chunks, act, chat) arrive later stages.
@@ -16,8 +20,10 @@ func (h *Hub) handleFrame(c *Client, payload []byte) {
 		c.sendLater(h.authOKFrame(c))
 	case MsgRoomJoin:
 		h.handleRoomJoin(c)
+	case MsgRoomAct:
+		h.handleRoomAct(c, bodyAny(body))
 	default:
-		c.sendLater(toastFrame(ToastInfo, "not implemented at this stage"))
+		c.sendLater(toastFrame(ToastInfo, gameplay.NotYetImplemented))
 	}
 }
 

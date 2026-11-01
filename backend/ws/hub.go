@@ -1,10 +1,8 @@
 package ws
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/coder/websocket"
 
@@ -30,22 +28,6 @@ func NewHub(authMan *auth.Manager, rooms *gameplay.Manager) *Hub {
 		clients: map[string]*Client{},
 		roomOf:  map[string]string{},
 	}
-}
-
-// drop removes the socket on disconnect (readPump defer).
-func (h *Hub) drop(c *Client) {
-	h.mu.Lock()
-	delete(h.clients, c.player.ID)
-	delete(h.roomOf, c.player.ID)
-	h.mu.Unlock()
-}
-
-// IsOnline reports a live socket for the everyone-connected start check.
-func (h *Hub) IsOnline(playerID string) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	_, ok := h.clients[playerID]
-	return ok
 }
 
 // CloseRoom closes every socket bound to the room with code 4404
